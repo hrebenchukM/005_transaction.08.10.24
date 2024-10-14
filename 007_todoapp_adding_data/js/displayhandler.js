@@ -3,9 +3,11 @@
 var queries = require('./queries');  
 
 module.exports = {
-    displayItems: function(req, res) {  
+    displayStudents: function(req, res) {  
+			var query = queries.getAllStudents(req, res)
 
-			var query = queries.getAllItems(req, res)
-
+    },
+    displayGroups: function(req, res) {
+        var query = queries.getAllGroups(req, res);
     }
 }

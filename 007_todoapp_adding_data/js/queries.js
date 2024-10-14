@@ -7,53 +7,131 @@ module.exports = {
 
     tableRows: ``,
     // выбор всех элементов и отображение в виде таблицы 
-    getAllItems: function (req, res) {
+    getAllStudents: function (req, res) {
 		
         var self = this; 		
 		self.tableRows = ``; 
 
 			var request = new mssql.Request(connection);  
 			request.stream = true; 
-			request.query("SELECT * FROM items"); 
+			request.query(`
+			SELECT 
+				Students.Id, 
+				Students.FirstName, 
+				Students.LastName, 
+				Groups.Name AS GroupName,  
+				Students.Term
+			FROM 
+				Students 
+			 JOIN 
+				Groups ON Students.Id_Group = Groups.Id 
+		`); 
 			
 			request.on('row', function(row){ 
 	
 				self.tableRows += ` <tr>
-							<td>${row.name} </td>
-							<td>${row.description}</td>
-							<td>${row.completed ? 'yes' : 'no'}</td>
+				            <td>${row.Id}</td>
+							<td>${row.FirstName} </td>
+							<td>${row.LastName}</td>
+							<td>${row.GroupName}</td>
+                            <td>${row.Term}</td>
 						</tr>` 
 			}); 
 			
 			request.on('done', function(affected) { 
-				console.log('show_items'); 
+				console.log('show_students'); 
 				res.render('index', { data:  self.tableRows }); 
 			})		
 
     }, 
 	// добавить элемент в бд
-	insertItem: function (data, req, res) {
+	insertStudent: function (data, req, res) {
 
 
 					var inserts = {
 						
-						name: data.name, 
-						description: data.description, 
-						completed: parseInt(data.completed)
+						FirstName: data.FirstName, 
+						LastName: data.LastName, 
+						Id_Group: parseInt(data.Id_Group,10), 
+						Term:   parseInt(  data.Term,10)
 					}
 				
 				   var ps = new mssql.PreparedStatement(connection);  
 				   
-				   ps.input('name', mssql.Text); 
-				   ps.input('description', mssql.Text); 
-				   ps.input('completed', mssql.Int); 
+				   ps.input('FirstName', mssql.NVarChar(50)); 
+				   ps.input('LastName', mssql.NVarChar(50)); 
+				   ps.input('Id_Group', mssql.Int); 
+				   ps.input('Term', mssql.Int); 
 				   
-				   ps.prepare("INSERT INTO items (name, description, completed) VALUES (@name , @description, @completed)", function(err) { 
+				   ps.prepare("INSERT INTO Students (FirstName,LastName,Id_Group,Term) VALUES (@FirstName,@LastName,@Id_Group,@Term)", function(err) { 
 						if (err) console.log(err); 
 					    var request = ps.execute(inserts, function(err) { 
 						
 							if (err) console.log(err); 
-							console.log('add item'); 
+							console.log('add student'); 
+							ps.unprepare(); 
+
+						}); 
+				
+				
+				})
+	},
+
+    // выбор всех элементов и отображение в виде таблицы 
+    getAllGroups: function (req, res) {
+		
+        var self = this; 		
+		self.tableRows = ``; 
+
+			var request = new mssql.Request(connection);  
+			request.stream = true; 
+			request.query(`
+			  SELECT 
+                Groups.Id, 
+                Groups.Name AS GroupName,
+                Faculties.Name AS FacultyName
+            FROM 
+                Groups
+            JOIN 
+                Faculties ON Groups.Id_Faculty = Faculties.Id
+        	`); 
+			
+			request.on('row', function(row){ 
+	
+				self.tableRows += ` <tr>
+				            <td>${row.Id}</td>
+							<td>${row.GroupName} </td>
+							<td>${row.FacultyName}</td>
+						</tr>` 
+			}); 
+			
+			request.on('done', function(affected) { 
+				console.log('show_groups'); 
+				res.render('group_index', { data:  self.tableRows }); 
+			})		
+
+    }, 
+	// добавить элемент в бд
+	insertGroup: function (data, req, res) {
+
+
+					var inserts = {
+						
+						Name: data.Name, 
+						Id_Faculty: parseInt(data.Id_Faculty,10), 
+						}
+				
+				   var ps = new mssql.PreparedStatement(connection);  
+				   
+				   ps.input('Name', mssql.NVarChar(50)); 
+				   ps.input('Id_Faculty', mssql.Int); 
+				 
+				   ps.prepare("INSERT INTO Groups (Name,Id_Faculty) VALUES (@Name,@Id_Faculty)", function(err) { 
+						if (err) console.log(err); 
+					    var request = ps.execute(inserts, function(err) { 
+						
+							if (err) console.log(err); 
+							console.log('add group'); 
 							ps.unprepare(); 
 
 						}); 
@@ -63,3 +141,5 @@ module.exports = {
 	}
 
 }
+
+

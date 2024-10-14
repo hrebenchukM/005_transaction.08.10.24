@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"> 
+<head> 
+<meta charset="utf-8">
+<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" /> 
+<link rel="stylesheet" type="text/css" href="css/style.css" />  
+<title>Groups</title>
+</head> 
+	
+<body> 
+	<div class="panel panel-primary">
+		<h1>Groups</h1>
+        <table class="table table-striped">
+			<thead>
+				<tr>
+					<th>Id</th>
+					<th>Group Name</th>
+					<th>Faculty Name</th>
+				</tr>
+			</thead>
+			<tbody>
+				<%- data %>
+			</tbody>
+		</table> 
+	</div>
+	<a href="/Groups/Add" class="btn btn-lg btn-info">Add group!</a> 
+</body>
+</html>

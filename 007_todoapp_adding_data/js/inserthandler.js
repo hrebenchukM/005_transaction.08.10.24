@@ -11,8 +11,15 @@ module.exports = {
     addRow: function (req, res) { 
 	
         // подключение к бд 
-
-			var query = queries.insertItem(req.body, req, res);  
+        console.log(req.body);
+			var query = queries.insertStudent(req.body, req, res);  
 	
+    },
+    loadAddPageGroups: function(req, res) {
+        res.render(path.join(__dirname, '../pages/add_group_page'));
+    },
+    addRowGroups: function(req, res) {
+        console.log(req.body);
+        var query = queries.insertGroup(req.body, req, res);
     }
 }

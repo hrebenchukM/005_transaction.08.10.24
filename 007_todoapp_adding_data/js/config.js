@@ -4,7 +4,7 @@ var config = {
 	user: 'admin',           // пользователь базы данных
 	password: '12345',          // пароль пользователя 
 	server: 'LENOVO\\SQLEXPRESS',       // хост
-	database: 'testdb',          // имя бд
+	database: 'Library',          // имя бд
 	port: 1433,             // порт, на котором запущен sql server
 	  options: {
 		  encrypt: true,  // Использование SSL/TLS

@@ -1,10 +1,12 @@
 ﻿var express  = require('express'); 
 var app = express();
-
 var port = 8080; 
-
 var path = require('path');
 var bodyParser = require('body-parser'); 
+
+
+
+
 
 // подключение модулей для обработки запросов 
 var displayHandler = require('./js/displayhandler'); 
@@ -19,15 +21,34 @@ app.use(express.static(path.join(__dirname, 'pages')));
 
 // middleware для обработки данных в формате JSON 
 app.use(bodyParser.json()); 
-app.use(bodyParser.text()); 
+app.use(bodyParser.text());
+
+
+
+
 
 // загрузить таблица с элементами 
-app.get('/', displayHandler.displayItems);
-
+app.get('/Students', displayHandler.displayStudents);
 // загрузка страницы для создания нового элемента 
-app.get('/add', insertHandler.loadAddPage); 
+app.get('/Students/Add', insertHandler.loadAddPage); 
 // добавить новый элемент 
-app.post('/add/newItem', insertHandler.addRow); 
+app.post('/Students/Add/newStudent', insertHandler.addRow); 
+
+
+// загрузить таблицу с группами
+app.get('/Groups', displayHandler.displayGroups);
+// загрузка страницы для создания новой группы
+app.get('/Groups/Add', insertHandler.loadAddPageGroups); 
+// добавить новую группу
+app.post('/Groups/Add/newGroup', insertHandler.addRowGroups); 
+
+
+
+
+
+
+
+
 
 // обработка ошибок 
 app.use(function(err, req, res, next) {
