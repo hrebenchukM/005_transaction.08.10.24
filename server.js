@@ -16,34 +16,115 @@ var config = {
 		  trustServerCertificate: true // Отключение проверки самоподписанного сертификата
 	  },
  }
-// var connection = new mssql.ConnectionPool(config);
+var connection = new mssql.ConnectionPool(config);
 
-// app.get('/', function (req, res) {
-// 	connection.connect(function (err) {
-// 		// транзакция - безопасная операция над бд с возможностью отката изменений в случае ошибки при выполнении запроса  
-// 		var transaction = new mssql.Transaction(connection);
+app.get('/Groups/Add', function (req, res) {
+	connection.connect(function (err) {
+		// транзакция - безопасная операция над бд с возможностью отката изменений в случае ошибки при выполнении запроса  
+		var transaction = new mssql.Transaction(connection);
 
-// 		transaction.begin(function (err) {
-// 			var request = new mssql.Request(transaction);
-// 			request.query("INSERT INTO Groups (Name, Id_Faculty,Counts) VALUES ('KN-P-221',3, 13)", function (err, data) {
+		transaction.begin(function (err) {
+			var request = new mssql.Request(transaction);
+			request.query("INSERT INTO Groups (Name, Id_Faculty) VALUES ('KN-P-221',3)", function (err, data) {
 
-// 				if (err) {
-// 					console.log(err);
-// 					transaction.rollback(function (err) {
-// 						console.log('rollback successful');
-// 						res.send('transaction rollback successful');
-// 					});
-// 				} 
-// 				else {
-// 					transaction.commit(function (err, data) {
-// 							console.log('data commit success');
-// 							res.send('transaction successful');
-// 					});
-// 				};
-// 			});
-// 		});
-// 	});
-// });
+				if (err) {
+					console.log(err);
+					transaction.rollback(function (err) {
+						console.log('rollback successful');
+						res.send('transaction rollback successful');
+					});
+				} 
+				else {
+					transaction.commit(function (err, data) {
+							console.log('data commit success');
+							res.send('transaction successful');
+					});
+				};
+			});
+		});
+	});
+});
+
+
+
+app.get('/Groups',function(req, res) { 
+
+	var connection = new mssql.ConnectionPool(config);
+
+	connection.connect(function (err) {
+		// Для выполнения запросов к бд используется метод request.query(command, callback(err, data))
+		// метод query принимает такие аргументы: 
+
+		// command - выражение t-sql 
+		// callback - функция с параметрами err(ошибка) и data(результат запроса к бд) 
+		var request = new mssql.Request(connection);
+		request.query(`
+			SELECT 
+				Groups.Id, 
+				Groups.Name, 
+				Faculties.Name AS FacultyName
+			FROM 
+				Groups 
+			 JOIN 
+				Faculties ON Groups.Id_Faculty = Faculties.Id 
+		`, function (err, data) {
+		
+			if (err) console.log(err);
+			else {
+				var allItems = data.recordset;
+
+				var html = ` 
+			<table border="1">
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Faculty Name</th>
+            </tr>
+			`;
+			
+				for (let i = 0; i < allItems.length; i++) {
+					html += `
+		 <tr>
+            <td>${allItems[i].Id}</td>
+            <td>${allItems[i].Name}</td>
+            <td>${allItems[i].FacultyName}</td>
+        </tr>`
+				}
+				res.send(html);
+				// завершить соединение 
+				connection.close();
+			}
+		});
+	});
+});
+
+
+app.get('/Faculties/Add', function (req, res) {
+	connection.connect(function (err) {
+		// транзакция - безопасная операция над бд с возможностью отката изменений в случае ошибки при выполнении запроса  
+		var transaction = new mssql.Transaction(connection);
+
+		transaction.begin(function (err) {
+			var request = new mssql.Request(transaction);
+			request.query("INSERT INTO Faculties (Name) VALUES ('Тестирование')", function (err, data) {
+
+				if (err) {
+					console.log(err);
+					transaction.rollback(function (err) {
+						console.log('rollback successful');
+						res.send('transaction rollback successful');
+					});
+				} 
+				else {
+					transaction.commit(function (err, data) {
+							console.log('data commit success');
+							res.send('transaction successful');
+					});
+				};
+			});
+		});
+	});
+});
 
 app.get('/Faculties',function(req, res) { 
 
@@ -91,6 +172,32 @@ app.get('/Faculties',function(req, res) {
 });
 
 
+app.get('/Students/Add', function (req, res) {
+	connection.connect(function (err) {
+		// транзакция - безопасная операция над бд с возможностью отката изменений в случае ошибки при выполнении запроса  
+		var transaction = new mssql.Transaction(connection);
+
+		transaction.begin(function (err) {
+			var request = new mssql.Request(transaction);
+			request.query("INSERT INTO Students (FirstName,LastName,Id_Group,Term) VALUES ('Мария','Гребенчук','11','2')", function (err, data) {
+
+				if (err) {
+					console.log(err);
+					transaction.rollback(function (err) {
+						console.log('rollback successful');
+						res.send('transaction rollback successful');
+					});
+				} 
+				else {
+					transaction.commit(function (err, data) {
+							console.log('data commit success');
+							res.send('transaction successful');
+					});
+				};
+			});
+		});
+	});
+});
 app.get('/Students',function(req, res) { 
 
 	var connection = new mssql.ConnectionPool(config);
@@ -149,58 +256,6 @@ app.get('/Students',function(req, res) {
 });
 
 
-app.get('/Groups',function(req, res) { 
-
-	var connection = new mssql.ConnectionPool(config);
-
-	connection.connect(function (err) {
-		// Для выполнения запросов к бд используется метод request.query(command, callback(err, data))
-		// метод query принимает такие аргументы: 
-
-		// command - выражение t-sql 
-		// callback - функция с параметрами err(ошибка) и data(результат запроса к бд) 
-		var request = new mssql.Request(connection);
-		request.query(`
-			SELECT 
-				Groups.Id, 
-				Groups.Name, 
-				Faculties.Name AS FacultyName
-			FROM 
-				Groups 
-			 JOIN 
-				Faculties ON Groups.Id_Faculty = Faculties.Id 
-		`, function (err, data) {
-		
-			if (err) console.log(err);
-			else {
-				var allItems = data.recordset;
-
-				var html = ` 
-			<table border="1">
-            <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>Faculty Name</th>
-            </tr>
-			`;
-			
-				for (let i = 0; i < allItems.length; i++) {
-					html += `
-		 <tr>
-            <td>${allItems[i].Id}</td>
-            <td>${allItems[i].Name}</td>
-            <td>${allItems[i].FacultyName}</td>
-        </tr>`
-				}
-				res.send(html);
-				// завершить соединение 
-				connection.close();
-			}
-		});
-	});
-});
-
-
 
 
 
@@ -208,38 +263,38 @@ app.get('/Groups',function(req, res) {
 
 // демонстрация отката изменений в случае ошибки при выполнении запроса к бд 
 
-// app.get('/error', function (req, res) {
-// 	var transaction = new mssql.Transaction(connection);
+app.get('/error', function (req, res) {
+	var transaction = new mssql.Transaction(connection);
 
-// 	transaction.begin(function (err) {
-// 		var request = new mssql.Request(transaction);
-// 		request.query("bad sql", function (err, data) {
-// 			if (err) {
-// 				console.log(err);
-// 				transaction.rollback(function (err) {
+	transaction.begin(function (err) {
+		var request = new mssql.Request(transaction);
+		request.query("bad sql", function (err, data) {
+			if (err) {
+				console.log(err);
+				transaction.rollback(function (err) {
 
-// 					if (err) {
-// 						console.log('rollback error');
-// 					}
-// 					else {
-// 						console.log('rollback successful');
-// 						res.send('transaction rollback successful');
-// 					}
-// 				});
-// 			} else {
-// 				transaction.commit(function (err, data) {
-// 					if (err) {
-// 						console.log('could not commit data');
-// 					}
-// 					else {
-// 						console.log('data commit success');
-// 						res.send('transaction successful');
-// 					};
-// 				});
-// 			};
-// 		});
-// 	});
-// });
+					if (err) {
+						console.log('rollback error');
+					}
+					else {
+						console.log('rollback successful');
+						res.send('transaction rollback successful');
+					}
+				});
+			} else {
+				transaction.commit(function (err, data) {
+					if (err) {
+						console.log('could not commit data');
+					}
+					else {
+						console.log('data commit success');
+						res.send('transaction successful');
+					};
+				});
+			};
+		});
+	});
+});
 
 app.listen(port, function () {
 
