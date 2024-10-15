@@ -138,6 +138,61 @@ module.exports = {
 				
 				
 				})
+	},
+	  // выбор всех элементов и отображение в виде таблицы 
+	  getAllFaculties: function (req, res) {
+		
+        var self = this; 		
+		self.tableRows = ``; 
+
+			var request = new mssql.Request(connection);  
+			request.stream = true; 
+			request.query(`
+	 SELECT 
+        Faculties.Id, 
+        Faculties.Name
+     FROM 
+        Faculties 
+		`); 
+			
+			request.on('row', function(row){ 
+	
+				self.tableRows += ` <tr>
+				            <td>${row.Id}</td>
+							<td>${row.Name} </td>
+						</tr>` 
+			}); 
+			
+			request.on('done', function(affected) { 
+				console.log('show_faculties'); 
+				res.render('faculty_index', { data:  self.tableRows }); 
+			})		
+
+    }, 
+	// добавить элемент в бд
+	insertFaculty: function (data, req, res) {
+
+
+					var inserts = {
+						Name: data.Name
+						}
+				
+				   var ps = new mssql.PreparedStatement(connection);  
+				   
+				   ps.input('Name', mssql.NVarChar(50));
+				 
+				   ps.prepare("INSERT INTO Faculties (Name) VALUES (@Name)", function(err) { 
+						if (err) console.log(err); 
+					    var request = ps.execute(inserts, function(err) { 
+						
+							if (err) console.log(err); 
+							console.log('add faculty'); 
+							ps.unprepare(); 
+
+						}); 
+				
+				
+				})
 	}
 
 }

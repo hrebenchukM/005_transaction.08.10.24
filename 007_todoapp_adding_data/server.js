@@ -25,7 +25,9 @@ app.use(bodyParser.text());
 
 
 
-
+app.get('/', function(req, res) {
+	res.sendFile(path.join(__dirname, 'index.html'));
+}); 
 
 // загрузить таблица с элементами 
 app.get('/Students', displayHandler.displayStudents);
@@ -41,6 +43,16 @@ app.get('/Groups', displayHandler.displayGroups);
 app.get('/Groups/Add', insertHandler.loadAddPageGroups); 
 // добавить новую группу
 app.post('/Groups/Add/newGroup', insertHandler.addRowGroups); 
+
+
+
+// загрузить таблицу с факультетами
+app.get('/Faculties', displayHandler.displayFaculties);
+// загрузка страницы для создания нового факультета
+app.get('/Faculties/Add', insertHandler.loadAddPageFaculties); 
+// добавить новій факультет
+app.post('/Faculties/Add/newFaculty', insertHandler.addRowFaculties); 
+
 
 
 

@@ -9,5 +9,8 @@ module.exports = {
     },
     displayGroups: function(req, res) {
         var query = queries.getAllGroups(req, res);
+    },
+    displayFaculties: function(req, res) {
+        var query = queries.getAllFaculties(req, res);
     }
 }

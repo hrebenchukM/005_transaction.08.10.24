@@ -21,5 +21,13 @@ module.exports = {
     addRowGroups: function(req, res) {
         console.log(req.body);
         var query = queries.insertGroup(req.body, req, res);
+    },
+
+    loadAddPageFaculties: function(req, res) {
+        res.render(path.join(__dirname, '../pages/add_faculty_page'));
+    },
+    addRowFaculties: function(req, res) {
+        console.log(req.body);
+        var query = queries.insertFaculty(req.body, req, res);
     }
 }
