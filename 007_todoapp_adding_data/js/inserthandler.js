@@ -30,4 +30,8 @@ module.exports = {
         console.log(req.body);
         var query = queries.insertFaculty(req.body, req, res);
     }
+
+    
 }
+
+
